@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Show Me Colors</title>
+</head>
+
+<body>
+
+    {% set color = frappe.form_dict.get("color") or "black" %}
+
+    <h2>Show Me Colors</h2>
+
+    <div style="width: 400px;
+                height: 200px;
+                background-color: {{ color }};
+                border: 2px solid black;">
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,41 @@
+{% extends "templates/web.html" %}
+
+{% block page_content %}
+
+<h1>Flight Details</h1>
+
+{% set airplane = frappe.get_doc("Airplane", doc.airplane) %}
+{% set airline = frappe.get_doc("Airline", airplane.airline) %}
+
+<p><strong>Airline:</strong> {{ airline.name }}</p>
+
+<p>
+    <strong>From:</strong>
+    {{ doc.source_airport_code }}
+</p>
+
+<p>
+    <strong>To:</strong>
+    {{ doc.destination_airport_code }}
+</p>
+
+<p>
+    <strong>Date:</strong>
+    {{ frappe.utils.format_date(doc.date_of_departure, "d MMMM, YYYY") }}
+</p>
+
+<p>
+    <strong>Departure Time:</strong>
+    {{ doc.time_of_departure }}
+</p>
+
+<p>
+    <strong>Duration:</strong>
+    {{ frappe.utils.format_duration(doc.duration) }}
+</p>
+
+<a href="/flight-booking-web-form/new?flight={{ doc.name|urlencode }}&flight_price=10000" class="btn btn-primary" style="background-color: #0d6efd; border-color: #0d6efd;">
+    Book Flight
+</a>
+
+{% endblock %}

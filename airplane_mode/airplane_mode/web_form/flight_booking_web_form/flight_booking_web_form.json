@@ -1,0 +1,54 @@
+{
+ "allow_comments": 0,
+ "allow_delete": 0,
+ "allow_edit": 0,
+ "allow_incomplete": 0,
+ "allow_multiple": 0,
+ "allow_print": 0,
+ "apply_document_permissions": 0,
+ "button_label": "Confirm",
+ "doc_type": "Airplane Ticket",
+ "doctype": "Web Form",
+ "introduction_text": "Fly with us!",
+ "is_standard": 1,
+ "login_required": 0,
+ "module": "airplane_mode",
+ "name": "flight-booking-web-form",
+ "published": 1,
+ "route": "flight-booking-web-form",
+ "show_sidebar": 0,
+ "success_url": "/flights",
+ "success_title": "Ticket Booked",
+ "success_message": "You will receive the details in your email soon",
+ "title": "Book Flight Ticket Web Form",
+ "web_form_fields": [
+  {
+   "doctype": "Web Form Field",
+   "fieldname": "passenger",
+   "fieldtype": "Link",
+   "idx": 1,
+   "label": "Passenger",
+   "options": "Flight Passenger",
+   "read_only": 0,
+   "reqd": 1
+  },
+  {
+   "doctype": "Web Form Field",
+   "fieldname": "flight",
+   "fieldtype": "Data",
+   "idx": 2,
+   "label": "Flight",
+   "read_only": 1,
+   "reqd": 1
+  },
+  {
+   "doctype": "Web Form Field",
+   "fieldname": "flight_price",
+   "fieldtype": "Currency",
+   "idx": 3,
+   "label": "Flight Price",
+   "read_only": 1,
+   "reqd": 0
+  }
+ ]
+}

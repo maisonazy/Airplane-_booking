@@ -14,7 +14,8 @@
   {
    "fieldname": "model",
    "fieldtype": "Data",
-   "label": "Model"
+   "label": "Model",
+   "reqd": 1
   },
   {
    "fieldname": "airline",

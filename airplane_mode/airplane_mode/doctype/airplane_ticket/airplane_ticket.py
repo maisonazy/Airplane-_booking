@@ -35,6 +35,8 @@ class AirplaneTicket(Document):
 	def validate(self):
 		self.remove_duplicate_addons()
 		self.calculate_total_amount()
+		if self.flight:
+			self.validate_flight_capacity()
 
 	def remove_duplicate_addons(self):
 		seen = set()
@@ -65,13 +67,15 @@ class AirplaneTicket(Document):
 		airplane = frappe.get_doc("Airplane", flight.airplane)
 		capacity = airplane.capacity
 
-		booked_tickets = frappe.db.count(
-			"Airplane Ticket",
-			filters={"flight": self.flight, "docstatus": 1},
-		)
+		filters = {"flight": self.flight, "docstatus": ["<", 2]}
+		if self.name:
+			filters["name"] = ["!=", self.name]
+
+		booked_tickets = frappe.db.count("Airplane Ticket", filters=filters)
 
 		if booked_tickets >= capacity:
 			frappe.throw(
 				f"Booking failed! The airplane capacity is {capacity}. "
-				"All seats for this flight have been booked."
+				"All seats for this flight have been booked.",
+				frappe.ValidationError,
 			)

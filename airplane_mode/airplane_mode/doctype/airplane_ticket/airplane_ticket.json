@@ -12,6 +12,7 @@
   "destination_airport",
   "source_airport_code",
   "destination_airport_code",
+  "airplane_image",
   "column_break_ukiq",
   "flight",
   "status",
@@ -87,7 +88,7 @@
    "fieldname": "status",
    "fieldtype": "Select",
    "label": "Status",
-   "options": "Booked\nChecked-In\nboarded",
+   "options": "Booked\nChecked-In\nBoarded",
    "reqd": 1
   },
   {
@@ -135,6 +136,7 @@
    "read_only": 1
   },
   {
+   "depends_on": "eval:doc.status == \"Checked-In\" || doc.status == \"Boarded\"",
    "fieldname": "seat",
    "fieldtype": "Data",
    "label": "Seat",
@@ -149,9 +151,15 @@
    "print_hide": 1,
    "read_only": 1,
    "search_index": 1
+  },
+  {
+   "fieldname": "airplane_image",
+   "fieldtype": "Attach Image",
+   "label": "Airplane Image"
   }
  ],
  "grid_page_length": 50,
+ "image_field": "airplane_image",
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [
@@ -160,7 +168,7 @@
    "link_fieldname": "flight"
   }
  ],
- "modified": "2026-11-21 11:49:26.479929",
+ "modified": "2026-11-24 17:39:12.072382",
  "modified_by": "Administrator",
  "module": "airplane_mode",
  "name": "Airplane Ticket",
@@ -177,6 +185,29 @@
    "report": 1,
    "role": "System Manager",
    "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Flight Crew Member",
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Travel Agent",
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Airport Authority Personnel",
    "write": 1
   }
  ],

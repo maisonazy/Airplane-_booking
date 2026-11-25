@@ -1,67 +1,77 @@
 # Copyright (c) 2026, hilla and contributors
 # For license information, please see license.txt
 
-# import frappe
-
-
+import random
 
 import frappe
 from frappe.model.document import Document
 from frappe.utils import flt
-import random
-import string
 
 
 class AirplaneTicket(Document):
+	def before_validate(self):
+		self.populate_flight_details()
 
-    def before_validate(self):
-        self.populate_flight_details()
+	def before_insert(self):
+		if not self.flight:
+			return
 
-    def before_insert(self):
-        self.populate_flight_details()
-        if not self.flight:
-            return
-        number = random.randint(1, 99)
-        letter = random.choice("ABCDE")
+		self.populate_flight_details()
+		self.seat = f"{random.randint(1, 99)}{random.choice('ABCDE')}"
 
-        self.seat = f"{number}{letter}"
+	def populate_flight_details(self):
+		if not self.flight:
+			return
 
-    def populate_flight_details(self):
-        if not self.flight:
-            return
+		flight = frappe.get_doc("Airplane Flight", self.flight)
+		self.source_airport = flight.source_airport
+		self.destination_airport = flight.destination_airport
+		self.source_airport_code = flight.source_airport_code
+		self.destination_airport_code = flight.destination_airport_code
+		self.departure_date = flight.date_of_departure
+		self.departure_time = flight.time_of_departure
+		self.duration_of_flight = flight.duration
 
-        flight = frappe.get_doc("Airplane Flight", self.flight)
-        self.source_airport = flight.source_airport
-        self.destination_airport = flight.destination_airport
-        self.source_airport_code = flight.source_airport_code
-        self.destination_airport_code = flight.destination_airport_code
-        self.departure_date = flight.date_of_departure
-        self.departure_time = flight.time_of_departure
-        self.duration_of_flight = flight.duration
+	def validate(self):
+		self.remove_duplicate_addons()
+		self.calculate_total_amount()
 
+	def remove_duplicate_addons(self):
+		seen = set()
+		unique_addons = []
 
-    def validate(self):
-        self.remove_duplicate_addons()
-        self.calculate_total_amount()
+		for addon in self.add_ons or []:
+			if addon.item not in seen:
+				seen.add(addon.item)
+				unique_addons.append(addon)
 
-    def remove_duplicate_addons(self):
-        seen = set()
-        unique_addons = []
+		self.add_ons = unique_addons
 
-        for addon in self.add_ons:
-            if addon.item not in seen:
-                seen.add(addon.item)
-                unique_addons.append(addon)
+	def calculate_total_amount(self):
+		addon_total = sum(flt(addon.amount) for addon in self.add_ons or [])
+		self.total_amount = flt(self.flight_price) + addon_total
 
-        self.add_ons = unique_addons
+	def before_submit(self):
+		if self.status != "Boarded":
+			frappe.throw("You can only submit a ticket when the passenger has boarded.")
 
-    def calculate_total_amount(self):
-        addon_total = sum(flt(addon.amount) for addon in self.add_ons)
+		self.validate_flight_capacity()
 
-        self.total_amount = flt(self.flight_price) + addon_total
+	def validate_flight_capacity(self):
+		if not self.flight:
+			frappe.throw("Please select an Airplane Flight.")
 
-    def before_submit(self):
-        if (self.status or "").casefold() != "boarded":
-            frappe.throw(
-                "Airplane Ticket can only be submitted when status is Boarded."
-            )
+		flight = frappe.get_doc("Airplane Flight", self.flight)
+		airplane = frappe.get_doc("Airplane", flight.airplane)
+		capacity = airplane.capacity
+
+		booked_tickets = frappe.db.count(
+			"Airplane Ticket",
+			filters={"flight": self.flight, "docstatus": 1},
+		)
+
+		if booked_tickets >= capacity:
+			frappe.throw(
+				f"Booking failed! The airplane capacity is {capacity}. "
+				"All seats for this flight have been booked."
+			)
